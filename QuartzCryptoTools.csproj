@@ -49,6 +49,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\FileHead.cs" />
+    <Compile Include="Utils\Files\ZipArchive.cs" />
     <Compile Include="Utils\HexStream.cs" />
   </ItemGroup>
   <ItemGroup>

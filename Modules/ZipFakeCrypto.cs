@@ -1,4 +1,5 @@
 ﻿using QuartzCryptoTools.Utils;
+using QuartzCryptoTools.Utils.Files;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,14 +10,8 @@ namespace QuartzCryptoTools.Modules
 {
     internal class ZipFakeCrypto
     {
-        private static int fileDirCount = 0;
-        private static int fileBlocksLength = 0;
-        private static String FileFullName = null;
         private static String FileLocation = null;
-        private static String totalString = null;
-        private static StringBuilder fileDirStream = new StringBuilder();
-        private static String[] totalStream = new string[2];
-        private static List<int> fileDirIndex = new List<int>();
+        private static ZipArchive zip;
         public static void Overview()
         {
             Program.PrintHead();
@@ -39,9 +34,9 @@ namespace QuartzCryptoTools.Modules
                 // Find if file exists
                 if (File.Exists(FileLocation))
                 {
-                    totalString = HexStream.GetString(FileLocation);
+                    zip = new ZipArchive(FileLocation);
                     // Search file head code
-                    if (totalString.Substring(0, 8) == FileHead.Zip)
+                    if (zip.String().Substring(0, 8) == FileHead.Zip)
                     {
                         Program.PrintHead();
                         Console.WriteLine("                 zip fake crypto");
@@ -53,43 +48,20 @@ namespace QuartzCryptoTools.Modules
                         Console.WriteLine("(q)uit      -   Return to main menu");
                         Console.Write(">");
                         String input = Console.ReadLine(); // C:\Users\CloverMoling\Desktop\text.zip
-
-                        // Get file name and stream
-                        String[] FileLocationArr = FileLocation.Split('\\');
-                        FileFullName = FileLocationArr[FileLocationArr.Length - 1];
-                        totalStream = HexStream.GetStream(FileLocation);
-
-                        // Get file blocks stream
-                        String fileDirString = Regex.Matches(totalString, @"504B0102\S*504B0506")[0].Value;
-                        fileBlocksLength = 0;
-                        for (int i = 0; i < fileDirString.Length; i += 2)
-                        {
-                            fileDirStream.Append(fileDirString.Substring(i, 2) + " ");
-                            fileBlocksLength++;
-                        }
-
-                        // Get file blocks count
-                        fileDirCount = 0;
-                        int index = -8;
-                        while ((index = totalString.IndexOf("504B0102", index + 8)) > -1)
-                        {
-                            fileDirIndex.Add(index);
-                            fileDirCount++;
-                        }
-
+                        
                         switch (input)
                         {
                             case "i":
                                 Program.PrintHead();
-                                GetInfo(FileLocation);
+                                GetInfo();
                                 break;
                             case "e":
                                 Program.PrintHead();
-                                Encrypt();
+                                Crypt("0","9","Crypted");
                                 break;
                             case "d":
                                 Program.PrintHead();
-                                Decrypt();
+                                Crypt("9", "0", "Decrypted");
                                 break;
                             case "q":
                                 FileLocation = null;
@@ -120,72 +92,59 @@ namespace QuartzCryptoTools.Modules
             }
         }
 
-        private static void GetInfo(String path)
+        private static void GetInfo()
         {
             Console.WriteLine("                 zip fake crypto");
             Console.WriteLine("================================================");
             Console.WriteLine("[ File Name: ]");
-            Console.WriteLine(FileFullName);
+            Console.WriteLine(zip.Name());
             Console.WriteLine("[ Total Stream: ]");
-            Console.WriteLine(totalStream[0]);
-            Console.WriteLine("[ Total: " + totalStream[1] + " Bytes ]");
+            Console.WriteLine(zip.Stream());
+            Console.WriteLine("[ Total: " + zip.Size() + " Bytes ]");
             Console.WriteLine("[ File Blocks: ]");
-            Console.WriteLine(fileDirStream.ToString());
-            Console.WriteLine("[ Total: " + fileBlocksLength + " Bytes ]");
-            Console.WriteLine("[ File Block count: " + fileDirCount + " ]");
+            Console.WriteLine(zip.FileBlocksStream());
+            Console.WriteLine("[ Total: " + zip.FileBlocksLength() + " Bytes ]");
+            Console.WriteLine("[ File Block count: " + zip.FileDirCount() + " ]");
             Console.WriteLine("Press any key to return");
             Console.ReadLine();
             Overview();
         }
 
-        private static void Encrypt()
+        private static void Crypt(String oldStr, String newStr, String method)
         {
-            String fakeCryptedLocation = FileLocation.Split('.')[0] + ".fakeCrypt.zip";
+            String fakeCryptedLocation = FileLocation.Split('.')[0] + "." + method + ".zip";
 
             Console.WriteLine("                 zip fake crypto");
             Console.WriteLine("================================================");
-            StringBuilder fakeCryptedTotalString = new StringBuilder(totalString);
-            StringBuilder fakeCryptedTotalStream = new StringBuilder();
-            for (int i = 0; i < fileDirIndex.Count; i++)
-            {
-                fakeCryptedTotalString.Replace("0", "9", fileDirIndex[i] + 17, 1);
-            }
-            for (int i = 0; i < fakeCryptedTotalString.ToString().Length; i += 2)
-            {
-                fakeCryptedTotalStream.Append(fakeCryptedTotalString.ToString().Substring(i, 2) + " ");
-            }
-            Console.WriteLine("[ Fake crypted stream: ]");
-            Console.WriteLine(fakeCryptedTotalStream.ToString());
-            HexStream.Write(fakeCryptedLocation, fakeCryptedTotalString.ToString());
+            StringBuilder CryptTotalString = new StringBuilder(zip.String());
+            StringBuilder CryptTotalStream = new StringBuilder();
 
-            Console.WriteLine("[ Fake crypted file path: ]");
+            // Replace crypt sign
+            for (int i = 0; i < zip.FileDirIndex().Count; i++)
+            {
+                CryptTotalString.Replace(oldStr, newStr, zip.FileDirIndex()[i] + 17, 1);
+            }
+
+            // Build result Stream
+            for (int i = 0; i < CryptTotalString.ToString().Length; i += 2)
+            {
+                CryptTotalStream.Append(CryptTotalString.ToString().Substring(i, 2) + " ");
+            }
+
+            // Print File Stream
+            Console.WriteLine("[ " + method + " stream: ]");
+            Console.WriteLine(CryptTotalStream.ToString());
+
+            // Write file with Hex
+            HexStream.Write(fakeCryptedLocation, CryptTotalString.ToString());
+
+            // Print output path
+            Console.WriteLine("[ " + method + " file path: ]");
             Console.WriteLine(fakeCryptedLocation);
-            Console.Read();
-        }
 
-        private static void Decrypt()
-        {
-            String decryptedLocation = FileLocation.Split('.')[0] + ".decrypted.zip";
-
-            Console.WriteLine("                 zip fake crypto");
-            Console.WriteLine("================================================");
-            StringBuilder fakeCryptedTotalString = new StringBuilder(totalString);
-            StringBuilder fakeCryptedTotalStream = new StringBuilder();
-            for (int i = 0; i < fileDirIndex.Count; i++)
-            {
-                fakeCryptedTotalString.Replace("9", "0", fileDirIndex[i] + 17, 1);
-            }
-            for (int i = 0; i < fakeCryptedTotalString.ToString().Length; i += 2)
-            {
-                fakeCryptedTotalStream.Append(fakeCryptedTotalString.ToString().Substring(i, 2) + " ");
-            }
-            Console.WriteLine("[ Decrypted stream: ]");
-            Console.WriteLine(fakeCryptedTotalStream.ToString());
-            HexStream.Write(decryptedLocation, fakeCryptedTotalString.ToString());
-
-            Console.WriteLine("[ Decrypted file path: ]");
-            Console.WriteLine(decryptedLocation);
-            Console.Read();
+            Console.WriteLine("Press any key to return");
+            Console.ReadLine();
+            Program.MainMenu();
         }
     }
 }
