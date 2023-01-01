@@ -1,0 +1,78 @@
+﻿<pu:WindowX x:Class="Graphical.MainWindow"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:pu="clr-namespace:Panuon.WPF.UI;assembly=Panuon.WPF.UI"
+            xmlns:local="clr-namespace:Graphical"
+            mc:Ignorable="d"
+            Title="QuartzCryptoTools"
+            Height="450" Width="800"
+            x:Name="Window"
+            pu:WindowXCaption.Buttons="MinimizeClose"
+            pu:WindowXCaption.Background="Transparent"
+            ResizeMode="CanMinimize"
+            MaskBrush="#AA000000"
+            IsOverlayerVisible="False"
+            IsMaskVisible="{Binding ElementName=Window, Path=IsOverlayerVisible}">
+    <pu:WindowX.Effect>
+        <pu:AcrylicWindowXEffect AccentColor="#22FFFFFF" />
+    </pu:WindowX.Effect>
+    <pu:WindowXCaption.HeaderTemplate>
+        <DataTemplate/>
+    </pu:WindowXCaption.HeaderTemplate>
+    <pu:WindowXCaption.CloseButtonStyle>
+        <Style TargetType="Button"
+               BasedOn="{StaticResource {x:Static pu:WindowXCaption.CloseButtonStyle}}">
+            <Setter Property="pu:ButtonHelper.HoverBackground"
+                    Value="{x:Null}"/>
+            <Setter Property="pu:ButtonHelper.HoverForeground"
+                    Value="Red"/>
+        </Style>
+    </pu:WindowXCaption.CloseButtonStyle>
+    <pu:WindowXCaption.MinimizeButtonStyle>
+        <Style TargetType="Button"
+               BasedOn="{StaticResource {x:Static pu:WindowXCaption.MinimizeButtonStyle}}">
+            <Setter Property="pu:ButtonHelper.HoverBackground"
+                    Value="{x:Null}"/>
+        </Style>
+    </pu:WindowXCaption.MinimizeButtonStyle>
+    <pu:WindowX.Overlayer>
+        <Grid>
+            <pu:Spin Width="50"
+                     Height="50"
+                     GlyphBrush="White"
+                     SpinStyle="Ring"/>
+            <TextBlock Text="Loading"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="0,80,0,0"/>
+        </Grid>
+    </pu:WindowX.Overlayer>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="35"/>
+            <ColumnDefinition Width="325"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="325"/>
+            <ColumnDefinition Width="35"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="35"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Column="1"
+              Grid.Row="0"
+              Background="#33000000">
+
+        </Grid>
+        <Grid Grid.Column="3"
+              Grid.Row="0">
+            <Button BorderThickness="1"
+                    BorderBrush="#777777"
+                    Background="Transparent"
+                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+        </Grid>
+    </Grid>
+</pu:WindowX>

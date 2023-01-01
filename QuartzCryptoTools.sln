@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32721.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartzCryptoTools", "QuartzCryptoTools.csproj", "{AB0A5812-D612-4F31-8432-17ECB2485507}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuartzCryptoTools - Graphical", "Graphical\QuartzCryptoTools - Graphical.csproj", "{92DB9468-7B33-4DBC-8D37-CC0D43404243}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AB0A5812-D612-4F31-8432-17ECB2485507}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB0A5812-D612-4F31-8432-17ECB2485507}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB0A5812-D612-4F31-8432-17ECB2485507}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92DB9468-7B33-4DBC-8D37-CC0D43404243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92DB9468-7B33-4DBC-8D37-CC0D43404243}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92DB9468-7B33-4DBC-8D37-CC0D43404243}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92DB9468-7B33-4DBC-8D37-CC0D43404243}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
