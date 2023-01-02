@@ -13,7 +13,7 @@
             pu:WindowXCaption.Background="Transparent"
             ResizeMode="CanMinimize"
             MaskBrush="#AA000000"
-            IsOverlayerVisible="False"
+            IsOverlayerVisible="{Binding OverlayerVisible}"
             IsMaskVisible="{Binding ElementName=Window, Path=IsOverlayerVisible}">
     <pu:WindowX.Effect>
         <pu:AcrylicWindowXEffect AccentColor="#22FFFFFF" />
@@ -39,40 +39,71 @@
     </pu:WindowXCaption.MinimizeButtonStyle>
     <pu:WindowX.Overlayer>
         <Grid>
-            <pu:Spin Width="50"
-                     Height="50"
-                     GlyphBrush="White"
-                     SpinStyle="Ring"/>
-            <TextBlock Text="Loading"
-                       Foreground="White"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Margin="0,80,0,0"/>
+            <Grid x:Name="LoadingOverlayer"
+                  Visibility="{Binding LoadingOverlayerVisible}">
+                <pu:Spin Width="50"
+                         Height="50"
+                         GlyphBrush="White"
+                         SpinStyle="Ring"/>
+                <TextBlock Text="Loading"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="0,80,0,0"/>
+            </Grid>
+            <Grid x:Name="StartUpOverlayer"
+                  Visibility="{Binding StartUpOverlayerVisible}">
+
+            </Grid>
         </Grid>
     </pu:WindowX.Overlayer>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="35"/>
-            <ColumnDefinition Width="325"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="325"/>
-            <ColumnDefinition Width="35"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="35"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Column="1"
-              Grid.Row="0"
-              Background="#33000000">
+        <pu:Carousel CurrentIndex="0"
+                     x:Name="MainCarousel"
+                     Animation="Scale,Fade"
+                     IndicatorVisibility="Collapsed"
+                     PageTurnButtonVisibility="Collapsed">
+            <Border>
+                <!-- Main Menu -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="325"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="325"/>
+                        <ColumnDefinition Width="35"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Column="1"
+                          Grid.Row="0"
+                          Background="#33000000">
 
-        </Grid>
-        <Grid Grid.Column="3"
-              Grid.Row="0">
-            <Button BorderThickness="1"
-                    BorderBrush="#777777"
-                    Background="Transparent"
-                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
-        </Grid>
+                    </Grid>
+                    <Grid Grid.Column="3"
+                          Grid.Row="0">
+                        <StackPanel Orientation="Vertical"
+                                    Margin="0,30,0,30">
+                            <Button Height="30"
+                                    Foreground="White"
+                                    Content=" Hex Viewer"
+                                    Background="Transparent"
+                                    Click="SwitchTo_HexViewer"
+                                    HorizontalContentAlignment="Left"
+                                    pu:ButtonHelper.HoverBackground="#22FFFFFF">
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border>
+                <!-- Hex Viewer -->
+                <Grid>
+                    
+                </Grid>
+            </Border>
+        </pu:Carousel>
     </Grid>
 </pu:WindowX>
