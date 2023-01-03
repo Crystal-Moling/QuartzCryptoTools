@@ -4,6 +4,7 @@ using Panuon.WPF.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,12 +60,25 @@ namespace Graphical
 
         #region 主页面部分代码
 
-        private void Load_FileInfo(String path)
+        private static List<String> FileHex;
+        private static String FileType;
+        private static String FileHead;
+
+        private async void Load_FileInfo(String path)
         {
             WindowOverlayer.Hide_StartUp();
+            WindowOverlayer.Show_Loading();
+            await Task.Run(() => { FileHex = HexHelper.ReadHex(path); });
+            WindowOverlayer.Hide_Loading();
+            FileHead = string.Join("", FileHex.Take(4).ToList());
+            try
+            { FileType = FileHeaders.Headers[FileHead]; }
+            catch (Exception)
+            { FileType = "Unkown File Type(" + FileHead + ")"; }
         }
 
-        private void SwitchTo_HexViewer(object sender, RoutedEventArgs e) { MainCarousel.CurrentIndex = 1; }
+        private void SwitchTo_HexViewer(object sender, RoutedEventArgs e)
+        { MainCarousel.CurrentIndex = 1; }
 
         #endregion
     }
@@ -72,6 +86,23 @@ namespace Graphical
     public class DataBind //数据绑定类
     {
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+
+        #region 全局绑定
+
+        public static String FileLocation
+        {
+            get => _fileLocation;
+            set
+            {
+                _fileLocation = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(FileLocation)));
+            }
+        }
+        private static String _fileLocation = "";
+
+        #endregion
+
+        #region 开屏弹窗部分绑定
 
         public static bool OverlayerVisible
         {
@@ -106,17 +137,6 @@ namespace Graphical
         }
         private static Visibility _startUpOverlayerVisible = Visibility.Collapsed;
 
-        public static String FileLocation
-        {
-            get => _fileLocation;
-            set
-            {
-                _fileLocation = value;
-                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(FileLocation)));
-            }
-        }
-        private static String _fileLocation = "";
-
         public static Brush FileLocationBorder
         {
             get => _fileLocationBorder;
@@ -138,6 +158,8 @@ namespace Graphical
             }
         }
         private static Brush _fileLocationColor = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+
+        #endregion
     }
 
     public class WindowOverlayer //遮罩层操作类

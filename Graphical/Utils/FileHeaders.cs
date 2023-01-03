@@ -8,7 +8,7 @@ namespace Graphical.Utils
 {
     internal class FileHeaders
     {
-        public Dictionary<string, string> Headers = new Dictionary<string, string>()
+        public static Dictionary<string, string> Headers = new Dictionary<string, string>()
         {
             { "504B0304", "zip" }
         };
