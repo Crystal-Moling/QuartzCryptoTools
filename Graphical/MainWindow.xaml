@@ -38,7 +38,8 @@
         </Style>
     </pu:WindowXCaption.MinimizeButtonStyle>
     <pu:WindowX.Overlayer>
-        <Grid>
+        <Grid MouseMove="Overlayer_MouseMove"
+              Background="Transparent">
             <Grid x:Name="LoadingOverlayer"
                   Visibility="{Binding LoadingOverlayerVisible}">
                 <pu:Spin Width="50"
@@ -53,7 +54,69 @@
             </Grid>
             <Grid x:Name="StartUpOverlayer"
                   Visibility="{Binding StartUpOverlayerVisible}">
-
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="120"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1"
+                      Background="LightGray">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0"
+                          Margin="50,0,50,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="1"
+                                   FontSize="20"
+                                   Text="新建工作区"/>
+                        <TextBlock Grid.Row="2"
+                                   Margin="30,0,0,0"
+                                   Text="要开始，请先选择一个文件"
+                                   Foreground="{Binding FileLocationColor}"/>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     BorderBrush="{Binding FileLocationBorder}"
+                                     Text="{Binding FileLocation}"/>
+                            <Button Margin="1"
+                                    Content="..."
+                                    Grid.Column="1"
+                                    Click="StartUp_BrowseFile"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                FontSize="15"
+                                FontWeight="Bold"
+                                Content="&#xe92d;"
+                                Background="#444444"
+                                Foreground="#FFFFFF"
+                                Click="StartUp_ExitApplication"
+                                FontFamily="{StaticResource PanuonIconFont}"/>
+                        <Button Grid.Column="1"
+                                FontSize="15"
+                                FontWeight="Bold"
+                                Content="&#xe92e;"
+                                Background="#EE2222"
+                                Foreground="#FFFFFF"
+                                Click="StartUp_LoadFile"
+                                FontFamily="{StaticResource PanuonIconFont}"/>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     </pu:WindowX.Overlayer>
