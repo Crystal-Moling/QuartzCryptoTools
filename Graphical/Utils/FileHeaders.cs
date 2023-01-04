@@ -10,7 +10,8 @@ namespace Graphical.Utils
     {
         public static Dictionary<string, string> Headers = new Dictionary<string, string>()
         {
-            { "504B0304", "zip" }
+            { "504B0304", "zip" },
+            { "FFD8FFE0", "jpg" }
         };
     }
 }

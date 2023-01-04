@@ -53,17 +53,18 @@ namespace Graphical
             if (DataBind.FileLocation == "")
             { DataBind.FileLocationBorder = DataBind.FileLocationColor = new SolidColorBrush(Color.FromArgb(255, 255, 119, 119)); }
             else
-            { Load_FileInfo(DataBind.FileLocation); }
+            { File_LoadInfo(DataBind.FileLocation); }
         }
 
         #endregion
 
         #region 主页面部分代码
 
+        private static bool IsFileTypeRecorded;
         private static List<byte> FileHex;
         private static String FileType;
 
-        private async void Load_FileInfo(String path)
+        private async void File_LoadInfo(String path)
         {
             WindowOverlayer.Hide_StartUp();
             WindowOverlayer.Show_Loading();
@@ -74,18 +75,29 @@ namespace Graphical
             foreach (byte HeaderByte in FileHeadBytes)
             { FileHead.Append(HeaderByte.ToString("X2")); }
             try
-            { FileType = FileHeaders.Headers[FileHead.ToString()]; }
+            { FileType = FileHeaders.Headers[FileHead.ToString()]; IsFileTypeRecorded = true; }
             catch (Exception)
-            { FileType = "Unrecorded File Type(" + FileHead.ToString() + ")"; }
+            { FileType = "Unrecorded File Type(" + FileHead.ToString() + ")"; IsFileTypeRecorded = false; }
             MessageBox.Show(FileType);
         }
 
-        private void Load_NewFile(object sender, RoutedEventArgs e)
+        private void File_LoadNew(object sender, RoutedEventArgs e)
         {
             OpenFileDialog selFile = new OpenFileDialog
             { Multiselect = false, Title = "请选择文件", Filter = "所有文件(*.*)|*.*" };
             if ((bool)selFile.ShowDialog())
-            { GC.Collect(); Load_FileInfo(selFile.FileName); }
+            { GC.Collect(); File_LoadInfo(selFile.FileName); }
+        }
+
+        private void File_Save(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog file = new SaveFileDialog();
+            if (IsFileTypeRecorded)
+            { file.Filter = FileType + "文件(*." + FileType + ")|*." + FileType; }
+            else
+            { file.Filter = "文件(*.*)|*.*"; }
+            if ((bool)file.ShowDialog())
+            { HexHelper.WriteHex(file.FileName, FileHex); }
         }
 
         private void SwitchTo_HexViewer(object sender, RoutedEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Graphical.Utils
 {
@@ -16,23 +17,17 @@ namespace Graphical.Utils
                 byte[] Buffer = new byte[nBytesToRead];
                 stream.Read(Buffer, 0, Buffer.Length);
                 stream.Close();
-                for (int i = 0; i < Buffer.Length; i++)
-                { fullStream.Add(Buffer[i]); }
+                fullStream = Buffer.ToList();
             }
             catch (Exception) { }
             return fullStream;
         }
 
-        public static void WriteHex(String path, List<String> hex)
+        public static void WriteHex(String path, List<byte> hex)
         {
-            byte[] Buffer = new byte[hex.Count];
-            for (int i = 0; i < hex.Count; i++)
-            { Buffer[i] = Convert.ToByte(hex[i], 16); }
-            FileStream stream = new FileStream(path, FileMode.OpenOrCreate);
-            BinaryWriter writer = new BinaryWriter(stream);
-            writer.Write(Buffer, 0, Buffer.Length);
+            BinaryWriter writer = new BinaryWriter(new FileStream(path, FileMode.OpenOrCreate));
+            writer.Write(hex.ToArray(), 0, hex.Count);
             writer.Close();
-            stream.Close();
         }
     }
 }
