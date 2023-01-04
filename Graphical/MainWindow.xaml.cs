@@ -43,7 +43,7 @@ namespace Graphical
         private void StartUp_BrowseFile(object sender, RoutedEventArgs e)
         {
             OpenFileDialog selFile = new OpenFileDialog
-            { Multiselect = false, Title = "请选择文件夹", Filter = "所有文件(*.*)|*.*" };
+            { Multiselect = false, Title = "请选择文件", Filter = "所有文件(*.*)|*.*" };
             if ((bool)selFile.ShowDialog())
             { DataBind.FileLocation = selFile.FileName; }
         }
@@ -60,9 +60,8 @@ namespace Graphical
 
         #region 主页面部分代码
 
-        private static List<String> FileHex;
+        private static List<byte> FileHex;
         private static String FileType;
-        private static String FileHead;
 
         private async void Load_FileInfo(String path)
         {
@@ -70,11 +69,23 @@ namespace Graphical
             WindowOverlayer.Show_Loading();
             await Task.Run(() => { FileHex = HexHelper.ReadHex(path); });
             WindowOverlayer.Hide_Loading();
-            FileHead = string.Join("", FileHex.Take(4).ToList());
+            List<byte> FileHeadBytes = FileHex.Take(4).ToList();
+            StringBuilder FileHead = new StringBuilder();
+            foreach (byte HeaderByte in FileHeadBytes)
+            { FileHead.Append(HeaderByte.ToString("X2")); }
             try
-            { FileType = FileHeaders.Headers[FileHead]; }
+            { FileType = FileHeaders.Headers[FileHead.ToString()]; }
             catch (Exception)
-            { FileType = "Unkown File Type(" + FileHead + ")"; }
+            { FileType = "Unrecorded File Type(" + FileHead.ToString() + ")"; }
+            MessageBox.Show(FileType);
+        }
+
+        private void Load_NewFile(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog selFile = new OpenFileDialog
+            { Multiselect = false, Title = "请选择文件", Filter = "所有文件(*.*)|*.*" };
+            if ((bool)selFile.ShowDialog())
+            { GC.Collect(); Load_FileInfo(selFile.FileName); }
         }
 
         private void SwitchTo_HexViewer(object sender, RoutedEventArgs e)

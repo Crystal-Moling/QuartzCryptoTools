@@ -6,18 +6,18 @@ namespace Graphical.Utils
 {
     internal class HexHelper
     {
-        public static List<String> ReadHex(String path)
+        public static List<byte> ReadHex(String path)
         {
-            List<String> fullStream = new List<String>();
+            List<byte> fullStream = new List<byte>();
             try
             {
                 FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
                 long nBytesToRead = stream.Length;
                 byte[] Buffer = new byte[nBytesToRead];
-                int m = stream.Read(Buffer, 0, Buffer.Length);
+                stream.Read(Buffer, 0, Buffer.Length);
                 stream.Close();
                 for (int i = 0; i < Buffer.Length; i++)
-                { fullStream.Add(Buffer[i].ToString("X2")); }
+                { fullStream.Add(Buffer[i]); }
             }
             catch (Exception) { }
             return fullStream;
