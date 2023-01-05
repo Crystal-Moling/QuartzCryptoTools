@@ -225,8 +225,14 @@
                                     Background="Transparent"
                                     Click="SwitchTo_HexViewer"
                                     HorizontalContentAlignment="Left"
-                                    pu:ButtonHelper.HoverBackground="#22FFFFFF">
-                            </Button>
+                                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                            <Button Height="30"
+                                    Foreground="White"
+                                    Content=" zip fake crypto"
+                                    Background="Transparent"
+                                    Click="SwitchTo_ZipFakeCrypto"
+                                    HorizontalContentAlignment="Left"
+                                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -234,6 +240,95 @@
             <Border>
                 <!-- Hex Viewer -->
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="517"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="153"/>
+                        <ColumnDefinition Width="25"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Content="&#xe91c;"
+                            Foreground="#FFFFFF"
+                            Click="SwitchTo_MainMenu"
+                            Background="Transparent"
+                            FontFamily="{StaticResource PanuonIconFont}"
+                            pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    <Grid Grid.Row="0"
+                          Grid.Column="1"
+                          Background="#33000000">
+                        <DataGrid Margin="6"
+                                  RowHeight="20"
+                                  ColumnWidth="30"
+                                  x:Name="HexTable"
+                                  IsReadOnly="False"
+                                  BorderThickness="0"
+                                  Foreground="#FFFFFF"
+                                  CanUserAddRows="False"
+                                  ItemsSource="{Binding}"
+                                  ColumnHeaderHeight="20"
+                                  CanUserResizeRows="False"
+                                  Background="Transparent"
+                                  CanUserSortColumns="False"
+                                  AutoGenerateColumns="False"
+                                  CanUserResizeColumns="False"
+                                  CanUserReorderColumns="False"
+                                  VerticalScrollBarVisibility="Visible"
+                                  pu:DataGridHelper.RowHoverBackground="#22FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderForeground="#000000"
+                                  pu:DataGridHelper.ColumnHeaderBackground="#FFFFFF"
+                                  pu:DataGridHelper.RowSelectedBackground="#22FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderHoverBackground="#FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderClickBackground="#FFFFFF">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="00" Binding="{Binding C00, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="01" Binding="{Binding C01, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="02" Binding="{Binding C02, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="03" Binding="{Binding C03, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="04" Binding="{Binding C04, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="05" Binding="{Binding C05, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="06" Binding="{Binding C06, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="07" Binding="{Binding C07, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="08" Binding="{Binding C08, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="09" Binding="{Binding C09, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0a" Binding="{Binding C0a, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0b" Binding="{Binding C0b, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0c" Binding="{Binding C0c, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0d" Binding="{Binding C0d, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0e" Binding="{Binding C0e, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0f" Binding="{Binding C0f, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border>
+                <!-- Zip Fake Crypto -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="517"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="153"/>
+                        <ColumnDefinition Width="25"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Content="&#xe91c;"
+                            Foreground="#FFFFFF"
+                            Click="SwitchTo_MainMenu"
+                            Background="Transparent"
+                            FontFamily="{StaticResource PanuonIconFont}"
+                            pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
                     
                 </Grid>
             </Border>

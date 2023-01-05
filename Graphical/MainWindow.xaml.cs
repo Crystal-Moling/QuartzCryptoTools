@@ -4,6 +4,7 @@ using Panuon.WPF.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -58,9 +59,23 @@ namespace Graphical
 
         #endregion
 
+        #region 页面切换部分代码
+
+        private void SwitchTo_MainMenu(object sender, RoutedEventArgs e)
+        { MainCarousel.CurrentIndex = 0; }
+
+        private void SwitchTo_HexViewer(object sender, RoutedEventArgs e)
+        { MainCarousel.CurrentIndex = 1; File_LoadHex(); }
+
+        private void SwitchTo_ZipFakeCrypto(object sender, RoutedEventArgs e)
+        { MainCarousel.CurrentIndex = 2; }
+
+        #endregion
+
         #region 主页面部分代码
 
         private static bool IsFileTypeRecorded;
+        private static String FileLocation;
         private static List<byte> FileHex;
         private string[] HeaderDict;
 
@@ -69,6 +84,8 @@ namespace Graphical
             WindowOverlayer.Hide_StartUp();
             // 载入文件字节
             WindowOverlayer.Show_Loading();
+            FileLocation = path;
+            // 异步读取文件字节
             await Task.Run(() => { FileHex = HexHelper.ReadHex(path); });
             WindowOverlayer.Hide_Loading();
             // 载入文件长度
@@ -82,13 +99,15 @@ namespace Graphical
             try
             {
                 HeaderDict = FileHeaders.Headers[FileHead.ToString()];
-                DataBind.FileType = HeaderDict[0] + " (" + path.Split(new char[] { '\\' }).Last().Split(new char[] { '.' }).Last() + ")";
+                // 通过预定义的字典构造文件类型选项
+                DataBind.FileType = HeaderDict[0] + " (" + path.Split(new char[] { '\\' }).Last().Split(new char[] { '.' }).Last() + ") [" + FileHead.ToString() + "]";
                 DataBind.FileDescription = HeaderDict[1];
                 IsFileTypeRecorded = true;
             }
             catch (Exception)
             {
-                DataBind.FileType = "Unrecorded File Type(" + FileHead.ToString() + ")";
+                // 未被定义的文件类型
+                DataBind.FileType = "Unrecorded File Type[" + FileHead.ToString() + "]";
                 DataBind.FileDescription = "No Description";
                 IsFileTypeRecorded = false;
             }
@@ -99,22 +118,85 @@ namespace Graphical
             OpenFileDialog selFile = new OpenFileDialog
             { Multiselect = false, Title = "请选择文件", Filter = "所有文件(*.*)|*.*" };
             if ((bool)selFile.ShowDialog())
-            { GC.Collect(); File_LoadInfo(selFile.FileName); }
+            { GC.Collect(); File_LoadInfo(selFile.FileName); IsHexLoaded = false; }
         }
 
         private void File_Save(object sender, RoutedEventArgs e)
         {
             SaveFileDialog file = new SaveFileDialog();
-            if (IsFileTypeRecorded)
-            { file.Filter = DataBind.FileType + "格式文件(" + HeaderDict[2] + ")|" + HeaderDict[2] + "|所有文件(*.*)|*.*"; }
+            file.FileName = FileLocation.Split(new char[] { '\\' }).Last();
+            if (IsFileTypeRecorded) // 使用源文件后缀构造文件类型选项
+            { file.Filter = file.FileName.Split(new char[] { '.' }).Last() + "格式文件(" + HeaderDict[2] + ")|" + HeaderDict[2] + "|所有文件(*.*)|*.*"; }
             else
             { file.Filter = "文件(*.*)|*.*"; }
             if ((bool)file.ShowDialog())
             { HexHelper.WriteHex(file.FileName, FileHex); }
         }
 
-        private void SwitchTo_HexViewer(object sender, RoutedEventArgs e)
-        { MainCarousel.CurrentIndex = 1; }
+        #endregion
+
+        #region Hex编辑器部分代码
+
+        private static bool IsHexLoaded = false;
+
+        private async void File_LoadHex()
+        {
+            // 判断文件Hex是否已经加载
+            if (!IsHexLoaded)
+            {
+                // 载入文件Hex信息
+                WindowOverlayer.Show_Loading();
+                // 异步加载Hex数据
+                await Task.Run(() => 
+                {
+                    String[] ColumnHeader = new string[] { "C00", "C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C0a", "C0b", "C0c", "C0d", "C0e", "C0f" };
+                    DataTable HexDataTable = new DataTable();
+                    // 添加绑定项
+                    foreach (String Header in ColumnHeader)
+                    { HexDataTable.Columns.Add(Header, typeof(String)); }
+                    foreach (String Header in ColumnHeader)
+                    {
+                        HexDataTable.Columns[Header].MaxLength = 2;
+                    }
+                    int ColumnIndex = 0; // 表格中的列号
+                    DataRow row = HexDataTable.NewRow();
+                    for (int i = 0; i < (int)Math.Ceiling((double)FileHex.Count / 16) * 16; i++)
+                    {
+                        // 是否写满一行
+                        if (ColumnIndex != 16)
+                        {
+                            try
+                            { row[ColumnHeader[ColumnIndex]] = FileHex[i].ToString("X2"); }
+                            catch (Exception)
+                            { row[ColumnHeader[ColumnIndex]] = " "; }
+                            ColumnIndex++;
+                        }
+                        else
+                        {
+                            // 将已写满的一行添加至表格
+                            HexDataTable.Rows.Add(row);
+                            // 创建新行
+                            row = HexDataTable.NewRow();
+                            //重置列号
+                            ColumnIndex = 0;
+                            try
+                            { row[ColumnHeader[ColumnIndex]] = FileHex[i].ToString("X2"); }
+                            catch (Exception)
+                            { row[ColumnHeader[ColumnIndex]] = " "; }
+                            ColumnIndex++;
+                        }
+                    }
+                    // 向表格中添加最后一行
+                    HexDataTable.Rows.Add(row);
+                    // 修改待绑定数据
+                    DataBind.HexTableBind = HexDataTable.DefaultView;
+                    IsHexLoaded = true;
+                });
+                // 绑定数据
+                HexTable.ItemsSource = DataBind.HexTableBind;
+                WindowOverlayer.Hide_Loading();
+            }
+        }
 
         #endregion
     }
@@ -232,6 +314,21 @@ namespace Graphical
         }
         private static int _fileLength = 0;
 
+
+        #endregion
+
+        #region Hex查看器部分绑定
+
+        public static DataView HexTableBind
+        {
+            get => _hexTableBind;
+            set
+            {
+                _hexTableBind = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(HexTableBind)));
+            }
+        }
+        private static DataView _hexTableBind = new DataView();
 
         #endregion
     }
