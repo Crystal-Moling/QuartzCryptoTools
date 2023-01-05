@@ -62,23 +62,36 @@ namespace Graphical
 
         private static bool IsFileTypeRecorded;
         private static List<byte> FileHex;
-        private static String FileType;
+        private string[] HeaderDict;
 
         private async void File_LoadInfo(String path)
         {
             WindowOverlayer.Hide_StartUp();
+            // 载入文件字节
             WindowOverlayer.Show_Loading();
             await Task.Run(() => { FileHex = HexHelper.ReadHex(path); });
             WindowOverlayer.Hide_Loading();
+            // 载入文件长度
+            DataBind.FileLength = FileHex.Count();
+            // 载入文件头
             List<byte> FileHeadBytes = FileHex.Take(4).ToList();
             StringBuilder FileHead = new StringBuilder();
             foreach (byte HeaderByte in FileHeadBytes)
             { FileHead.Append(HeaderByte.ToString("X2")); }
+            // 判断文件类型
             try
-            { FileType = FileHeaders.Headers[FileHead.ToString()]; IsFileTypeRecorded = true; }
+            {
+                HeaderDict = FileHeaders.Headers[FileHead.ToString()];
+                DataBind.FileType = HeaderDict[0] + " (" + path.Split(new char[] { '\\' }).Last().Split(new char[] { '.' }).Last() + ")";
+                DataBind.FileDescription = HeaderDict[1];
+                IsFileTypeRecorded = true;
+            }
             catch (Exception)
-            { FileType = "Unrecorded File Type(" + FileHead.ToString() + ")"; IsFileTypeRecorded = false; }
-            MessageBox.Show(FileType);
+            {
+                DataBind.FileType = "Unrecorded File Type(" + FileHead.ToString() + ")";
+                DataBind.FileDescription = "No Description";
+                IsFileTypeRecorded = false;
+            }
         }
 
         private void File_LoadNew(object sender, RoutedEventArgs e)
@@ -93,7 +106,7 @@ namespace Graphical
         {
             SaveFileDialog file = new SaveFileDialog();
             if (IsFileTypeRecorded)
-            { file.Filter = FileType + "文件(*." + FileType + ")|*." + FileType; }
+            { file.Filter = DataBind.FileType + "格式文件(" + HeaderDict[2] + ")|" + HeaderDict[2] + "|所有文件(*.*)|*.*"; }
             else
             { file.Filter = "文件(*.*)|*.*"; }
             if ((bool)file.ShowDialog())
@@ -181,6 +194,44 @@ namespace Graphical
             }
         }
         private static Brush _fileLocationColor = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+
+        #endregion
+
+        #region 主菜单部分绑定
+
+        public static String FileType
+        {
+            get => _fileType;
+            set
+            {
+                _fileType = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(FileType)));
+            }
+        }
+        private static String _fileType = "";
+
+        public static String FileDescription
+        {
+            get => _fileDescription;
+            set
+            {
+                _fileDescription = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(FileDescription)));
+            }
+        }
+        private static String _fileDescription = "";
+
+        public static int FileLength
+        {
+            get => _fileLength;
+            set
+            {
+                _fileLength = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(FileLength)));
+            }
+        }
+        private static int _fileLength = 0;
+
 
         #endregion
     }
