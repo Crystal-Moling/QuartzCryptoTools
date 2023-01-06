@@ -305,6 +305,30 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
+                    <StackPanel Width="30"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Background="#22FFFFFF"
+                                HorizontalAlignment="Left">
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe9b1;"
+                                ToolTip="Save File"
+                                Foreground="White"
+                                Click="File_SaveHex"
+                                Background="Transparent"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe971;"
+                                Foreground="White"
+                                ToolTip="Reload File"
+                                Click="File_ReloadHex"
+                                Background="Transparent"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    </StackPanel>
                 </Grid>
             </Border>
             <Border>

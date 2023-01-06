@@ -154,10 +154,6 @@ namespace Graphical
                     // 添加绑定项
                     foreach (String Header in ColumnHeader)
                     { HexDataTable.Columns.Add(Header, typeof(String)); }
-                    foreach (String Header in ColumnHeader)
-                    {
-                        HexDataTable.Columns[Header].MaxLength = 2;
-                    }
                     int ColumnIndex = 0; // 表格中的列号
                     DataRow row = HexDataTable.NewRow();
                     for (int i = 0; i < (int)Math.Ceiling((double)FileHex.Count / 16) * 16; i++)
@@ -196,6 +192,35 @@ namespace Graphical
                 HexTable.ItemsSource = DataBind.HexTableBind;
                 WindowOverlayer.Hide_Loading();
             }
+        }
+
+        private void File_SaveHex(object sender, RoutedEventArgs e)
+        {
+            List<byte> bytes = new List<byte>();
+            // 读取Hex表中每个Hex值并转换为Byte
+            for (int i = 0; i < DataBind.HexTableBind.Count; i++)
+            {
+                for (int j = 0; j <= 15; j++)
+                {
+                    try
+                    { bytes.Add(Convert.ToByte(DataBind.HexTableBind[i].Row[j].ToString().Substring(0, 2), 16)); }
+                    catch (Exception) { }
+                }
+            }
+            SaveFileDialog file = new SaveFileDialog();
+            file.FileName = FileLocation.Split(new char[] { '\\' }).Last();
+            if (IsFileTypeRecorded) // 使用源文件后缀构造文件类型选项
+            { file.Filter = file.FileName.Split(new char[] { '.' }).Last() + "格式文件(" + HeaderDict[2] + ")|" + HeaderDict[2] + "|所有文件(*.*)|*.*"; }
+            else
+            { file.Filter = "文件(*.*)|*.*"; }
+            if ((bool)file.ShowDialog())
+            { HexHelper.WriteHex(file.FileName, bytes); }
+        }
+
+        private void File_ReloadHex(object sender, RoutedEventArgs e)
+        {
+            IsHexLoaded = false;
+            File_LoadHex();
         }
 
         #endregion
