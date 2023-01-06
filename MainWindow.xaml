@@ -1,0 +1,521 @@
+﻿<pu:WindowX x:Class="QuartzCryptoTools.MainWindow"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:pu="clr-namespace:Panuon.WPF.UI;assembly=Panuon.WPF.UI"
+            mc:Ignorable="d"
+            Title="QuartzCryptoTools"
+            Height="450" Width="800"
+            x:Name="Window"
+            pu:WindowXCaption.Buttons="MinimizeClose"
+            pu:WindowXCaption.Background="Transparent"
+            ResizeMode="CanMinimize"
+            MaskBrush="#AA000000"
+            WindowStartupLocation="CenterScreen"
+            IsOverlayerVisible="{Binding OverlayerVisible}"
+            IsMaskVisible="{Binding ElementName=Window, Path=IsOverlayerVisible}">
+    <pu:WindowX.Effect>
+        <pu:AcrylicWindowXEffect AccentColor="#22FFFFFF" />
+    </pu:WindowX.Effect>
+    <pu:WindowXCaption.HeaderTemplate>
+        <DataTemplate/>
+    </pu:WindowXCaption.HeaderTemplate>
+    <pu:WindowXCaption.CloseButtonStyle>
+        <Style TargetType="Button"
+               BasedOn="{StaticResource {x:Static pu:WindowXCaption.CloseButtonStyle}}">
+            <Setter Property="pu:ButtonHelper.HoverBackground"
+                    Value="{x:Null}"/>
+            <Setter Property="pu:ButtonHelper.HoverForeground"
+                    Value="Red"/>
+        </Style>
+    </pu:WindowXCaption.CloseButtonStyle>
+    <pu:WindowXCaption.MinimizeButtonStyle>
+        <Style TargetType="Button"
+               BasedOn="{StaticResource {x:Static pu:WindowXCaption.MinimizeButtonStyle}}">
+            <Setter Property="pu:ButtonHelper.HoverBackground"
+                    Value="{x:Null}"/>
+        </Style>
+    </pu:WindowXCaption.MinimizeButtonStyle>
+    <pu:WindowX.Overlayer>
+        <Grid MouseMove="Overlayer_MouseMove"
+              Background="Transparent">
+            <Grid x:Name="LoadingOverlayer"
+                  Visibility="{Binding LoadingOverlayerVisible}">
+                <pu:Spin Width="50"
+                         Height="50"
+                         GlyphBrush="White"
+                         SpinStyle="Ring"/>
+                <TextBlock Text="Loading"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="0,80,0,0"/>
+            </Grid>
+            <Grid x:Name="StartUpOverlayer"
+                  Visibility="{Binding StartUpOverlayerVisible}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="120"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1"
+                      Background="LightGray">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0"
+                          Margin="50,0,50,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="1"
+                                   FontSize="20"
+                                   Text="新建工作区"/>
+                        <TextBlock Grid.Row="2"
+                                   Margin="30,0,0,0"
+                                   Text="要开始，请先选择一个文件"
+                                   Foreground="{Binding FileLocationColor}"/>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     BorderBrush="{Binding FileLocationBorder}"
+                                     Text="{Binding FileLocation}"/>
+                            <Button Margin="1"
+                                    Content="..."
+                                    Grid.Column="1"
+                                    Click="StartUp_BrowseFile"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                FontSize="15"
+                                FontWeight="Bold"
+                                Content="&#xe92d;"
+                                Background="#444444"
+                                Foreground="#FFFFFF"
+                                Click="StartUp_ExitApplication"
+                                FontFamily="{StaticResource PanuonIconFont}"/>
+                        <Button Grid.Column="1"
+                                FontSize="15"
+                                FontWeight="Bold"
+                                Content="&#xe92e;"
+                                Background="#EE2222"
+                                Foreground="#FFFFFF"
+                                Click="StartUp_LoadFile"
+                                FontFamily="{StaticResource PanuonIconFont}"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid x:Name="MessageBoxOverlayer"
+                  Visibility="{Binding MessageBoxOverlayerVisible}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="120"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1"
+                      Background="LightGray">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0"
+                          Margin="50,0,50,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="75"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="25"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="1"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   Text="{Binding MessageBoxString}"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Button FontSize="15"
+                                FontWeight="Bold"
+                                Content="&#xe92e;"
+                                Background="#EE2222"
+                                Foreground="#FFFFFF"
+                                Click="Hide_MessageBox"
+                                FontFamily="{StaticResource PanuonIconFont}"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </pu:WindowX.Overlayer>
+    <Grid>
+        <pu:Carousel CurrentIndex="0"
+                     x:Name="MainCarousel"
+                     Animation="Scale,Fade"
+                     IndicatorVisibility="Collapsed"
+                     PageTurnButtonVisibility="Collapsed">
+            <Border>
+                <!-- Main Menu -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="325"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="325"/>
+                        <ColumnDefinition Width="35"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0"
+                                Background="#33000000">
+                        <TextBlock Margin="10"
+                                   FontSize="20"
+                                   Text="File Info"
+                                   Foreground="White"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="File Name"
+                                       Margin="25,2,2,2"
+                                       Foreground="White"/>
+                            <TextBlock Grid.Column="1"
+                                       Margin="30,2,2,2"
+                                       Foreground="White"
+                                       Text="{Binding FileName}"/>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="File Type"
+                                       Margin="25,2,2,2"
+                                       Foreground="White"/>
+                            <TextBlock Grid.Column="1"
+                                       Margin="38,2,2,2"
+                                       Foreground="White"
+                                       Text="{Binding FileType}"/>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Description"
+                                       Margin="25,2,2,2"
+                                       Foreground="White"/>
+                            <TextBlock Grid.Column="1"
+                                       Margin="23,2,2,2"
+                                       Foreground="White"
+                                       Text="{Binding FileDescription}"/>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="File Length"
+                                       Margin="25,2,2,2"
+                                       Foreground="White"/>
+                            <TextBlock Grid.Column="1"
+                                       Margin="25,2,2,2"
+                                       Foreground="White"
+                                       Text="{Binding FileLength, StringFormat={}{0} Bytes}"/>
+                        </Grid>
+                    </StackPanel>
+                    <Grid Grid.Column="3"
+                          Grid.Row="0">
+                        <StackPanel Orientation="Vertical"
+                                    Margin="0,10,0,30">
+                            <Grid Height="30"
+                                  HorizontalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0"
+                                        FontSize="20"
+                                        Content="&#xe9a5;"
+                                        Foreground="White"
+                                        Click="File_LoadNew"
+                                        ToolTip="Open New File"
+                                        Background="Transparent"
+                                        FontFamily="{StaticResource PanuonIconFont}"
+                                        pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                                <Button Grid.Column="1"
+                                        FontSize="20"
+                                        Click="File_Save"
+                                        Content="&#xe9b1;"
+                                        ToolTip="Save File"
+                                        Foreground="White"
+                                        Background="Transparent"
+                                        FontFamily="{StaticResource PanuonIconFont}"
+                                        pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                            </Grid>
+                            <Button Height="30"
+                                    Foreground="White"
+                                    Content=" Hex Viewer"
+                                    Background="Transparent"
+                                    Click="SwitchTo_HexViewer"
+                                    HorizontalContentAlignment="Left"
+                                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                            <Button Height="30"
+                                    Foreground="White"
+                                    Content=" Zip Directory Modifier"
+                                    Background="Transparent"
+                                    Click="SwitchTo_ZipFakeCrypto"
+                                    HorizontalContentAlignment="Left"
+                                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                            <Button Height="30"
+                                    Foreground="White"
+                                    Background="Transparent"
+                                    Content=" Lsb Steganography"
+                                    Click="SwitchTo_LsbSteganography"
+                                    HorizontalContentAlignment="Left"
+                                    pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border>
+                <!-- Hex Viewer -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="517"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="153"/>
+                        <ColumnDefinition Width="25"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Content="&#xe91c;"
+                            Foreground="#FFFFFF"
+                            Click="SwitchTo_MainMenu"
+                            Background="Transparent"
+                            FontFamily="{StaticResource PanuonIconFont}"
+                            pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    <Grid Grid.Row="0"
+                          Grid.Column="1"
+                          Background="#33000000">
+                        <DataGrid Margin="6"
+                                  RowHeight="20"
+                                  ColumnWidth="30"
+                                  x:Name="HexTable"
+                                  IsReadOnly="False"
+                                  BorderThickness="0"
+                                  Foreground="#FFFFFF"
+                                  CanUserAddRows="False"
+                                  ItemsSource="{Binding}"
+                                  ColumnHeaderHeight="20"
+                                  CanUserResizeRows="False"
+                                  Background="Transparent"
+                                  CanUserSortColumns="False"
+                                  AutoGenerateColumns="False"
+                                  CanUserResizeColumns="False"
+                                  CanUserReorderColumns="False"
+                                  VerticalScrollBarVisibility="Visible"
+                                  pu:DataGridHelper.RowHoverBackground="#22FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderForeground="#000000"
+                                  pu:DataGridHelper.ColumnHeaderBackground="#FFFFFF"
+                                  pu:DataGridHelper.RowSelectedBackground="#22FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderHoverBackground="#FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderClickBackground="#FFFFFF">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="00" Binding="{Binding C00, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="01" Binding="{Binding C01, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="02" Binding="{Binding C02, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="03" Binding="{Binding C03, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="04" Binding="{Binding C04, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="05" Binding="{Binding C05, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="06" Binding="{Binding C06, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="07" Binding="{Binding C07, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="08" Binding="{Binding C08, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="09" Binding="{Binding C09, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0a" Binding="{Binding C0a, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0b" Binding="{Binding C0b, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0c" Binding="{Binding C0c, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0d" Binding="{Binding C0d, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0e" Binding="{Binding C0e, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="0f" Binding="{Binding C0f, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                    <StackPanel Width="30"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Background="#22FFFFFF"
+                                HorizontalAlignment="Left">
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe9b1;"
+                                ToolTip="Save File"
+                                Foreground="White"
+                                Click="File_SaveHex"
+                                Background="Transparent"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe971;"
+                                Foreground="White"
+                                ToolTip="Reload File"
+                                Click="File_ReloadHex"
+                                Background="Transparent"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border>
+                <!-- Zip Directory Modifier -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="517"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="153"/>
+                        <ColumnDefinition Width="25"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Content="&#xe91c;"
+                            Foreground="#FFFFFF"
+                            Click="SwitchTo_MainMenu"
+                            Background="Transparent"
+                            FontFamily="{StaticResource PanuonIconFont}"
+                            pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    <Grid Grid.Row="0"
+                          Grid.Column="1"
+                          Background="#33000000">
+                        <DataGrid Margin="6"
+                                  RowHeight="20"
+                                  IsReadOnly="True"
+                                  BorderThickness="0"
+                                  x:Name="ArchiveDict"
+                                  Foreground="#FFFFFF"
+                                  CanUserAddRows="False"
+                                  ItemsSource="{Binding}"
+                                  ColumnHeaderHeight="20"
+                                  CanUserResizeRows="False"
+                                  Background="Transparent"
+                                  CanUserSortColumns="False"
+                                  AutoGenerateColumns="False"
+                                  CanUserReorderColumns="False"
+                                  VerticalScrollBarVisibility="Visible"
+                                  pu:DataGridHelper.RowHoverBackground="#22FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderForeground="#000000"
+                                  pu:DataGridHelper.ColumnHeaderBackground="#FFFFFF"
+                                  pu:DataGridHelper.RowSelectedBackground="#22FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderHoverBackground="#FFFFFF"
+                                  pu:DataGridHelper.ColumnHeaderClickBackground="#FFFFFF">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="Encrypted" Binding="{Binding Encrypted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="CRC-32" Binding="{Binding CRC-32, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="SuprressedSize" Binding="{Binding SuprressedSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DataGridTextColumn Header="PreviousSize" Binding="{Binding PreviousSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                    <StackPanel Width="30"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Background="#22FFFFFF"
+                                HorizontalAlignment="Left">
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe9b1;"
+                                ToolTip="Save File"
+                                Foreground="White"
+                                Click="Zip_SaveArchive"
+                                Background="Transparent"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe966;"
+                                Foreground="White"
+                                Click="Zip_FakeEncrypt"
+                                Background="Transparent"
+                                ToolTip="Fake Crypto - Encrypt"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe968;"
+                                Foreground="White"
+                                Click="Zip_FakeDecrypt"
+                                Background="Transparent"
+                                ToolTip="Fake Crypto - Decrypt"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                        <Button Height="30"
+                                FontSize="20"
+                                Content="&#xe971;"
+                                Foreground="White"
+                                Background="Transparent"
+                                ToolTip="Reload Directory"
+                                Click="Zip_ReloadDirectory"
+                                FontFamily="{StaticResource PanuonIconFont}"
+                                pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border>
+                <!-- Lsb Steganography -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="330"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="330"/>
+                        <ColumnDefinition Width="35"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Content="&#xe91c;"
+                            Foreground="#FFFFFF"
+                            Click="SwitchTo_MainMenu"
+                            Background="Transparent"
+                            FontFamily="{StaticResource PanuonIconFont}"
+                            pu:ButtonHelper.HoverBackground="#22FFFFFF"/>
+                    <Grid Grid.Row="0"
+                          Grid.Column="1"
+                          Background="#33000000">
+                        
+                    </Grid>
+                </Grid>
+            </Border>
+        </pu:Carousel>
+    </Grid>
+</pu:WindowX>
