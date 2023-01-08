@@ -436,7 +436,7 @@
                                   pu:DataGridHelper.ColumnHeaderClickBackground="#FFFFFF">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
-                                <DataGridTextColumn Header="LastModify" Binding="{Binding LastModify, StringFormat={}{0} Bytes}"/>
+                                <DataGridTextColumn Header="LastModify" Binding="{Binding LastModify}"/>
                                 <DataGridTextColumn Header="SuprressedSize" Binding="{Binding SuprressedSize, StringFormat={}{0} Bytes}"/>
                                 <DataGridTextColumn Header="PreviousSize" Binding="{Binding PreviousSize, StringFormat={}{0} Bytes}"/>
                                 <DataGridTextColumn Header="Encrypted" Binding="{Binding Encrypted}"/>

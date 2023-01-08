@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,6 +26,8 @@ namespace QuartzCryptoTools
     /// </summary>
     public partial class MainWindow : WindowX, INotifyPropertyChanged
     {
+        [DllImport("kernel32")]
+        private static extern Object DosDateTimeToFileTime(DateTime dt);
         public MainWindow()
         {
             InitializeComponent();
@@ -301,31 +304,17 @@ namespace QuartzCryptoTools
                                 for (int j = i + 46; j < i + 46 + FileNameLength; j++)
                                 { FileNameByte.Add(ZipModifierTempFile[j]); }
                                 row["Name"] = Encoding.UTF8.GetString(FileNameByte.ToArray());
+                                // 加载修改日期 参考：https://stackoverflow.com/questions/15744647/converting-date-to-dos-date
+                                ushort ByteDateInt = (ushort)Convert.ToInt32(DictHeader[15].ToString("X2") + DictHeader[14].ToString("X2"), 16);
+                                DateTime dateTime = new DateTime((ByteDateInt >> 9) + 1980, (ByteDateInt >> 5) & 0xF, ByteDateInt & 0x1F);
                                 // 加载修改时间
-                                int TotalSec = 0;
-                                String Byte12Hex = DictHeader[12].ToString("X2");
-                                int Byte12FInt = Convert.ToInt32(Byte12Hex.Substring(0, 1), 16);
-                                int Byte12BInt = Convert.ToInt32(Byte12Hex.Substring(1, 1), 16);
-                                String Byte13Hex = DictHeader[13].ToString("X2");
-                                int Byte13FInt = Convert.ToInt32(Byte13Hex.Substring(0, 1), 16);
-                                int Byte13BInt = Convert.ToInt32(Byte13Hex.Substring(1, 1), 16);
-                                // 换算第一位时间
-                                if (Byte12FInt % 2 == 0)
-                                { TotalSec = TotalSec + (60 * (Byte12FInt / 2)); }
-                                else
-                                { TotalSec = TotalSec + (int)(60 * Math.Floor((double)Byte12FInt / 2) + 32); }
-                                // 换算第二位时间
-                                TotalSec = TotalSec + Byte12BInt * 2;
-                                // 换算第三位时间
-                                TotalSec = TotalSec + Byte13FInt * (2 * 60 * 60);
-                                // 换算第四位时间
-                                if (Byte13BInt < 8)
-                                { TotalSec = TotalSec + Byte13BInt * (8 * 60); }
-                                else if(Byte13FInt == 8) 
-                                { TotalSec = TotalSec + (60 * 60); }
-                                else if (Byte13BInt > 8)
-                                { TotalSec = TotalSec + (60 * 60) + (Byte13BInt - 8) * (8 * 60); }
-                                int k = 0;
+                                // 换算第一字节时间
+                                int Byte12Int = Convert.ToInt32(DictHeader[12].ToString("X2"), 16);
+                                dateTime = dateTime.AddSeconds(Byte12Int * 2 - (((int)Math.Ceiling((Double)Byte12Int / 32) - 1) * 4));
+                                // 换算第二字节时间
+                                int Byte13Int = Convert.ToInt32(DictHeader[13].ToString("X2"), 16);
+                                dateTime = dateTime.AddMinutes(Byte13Int * 8 - (((int)Math.Ceiling((Double)Byte13Int / 8) - 1) * 4));
+                                row["LastModify"] = dateTime.ToString();
                                 // 加入文件信息
                                 ArchiveDictTable.Rows.Add(row);
                                 // 移动至该目录信息结束处
