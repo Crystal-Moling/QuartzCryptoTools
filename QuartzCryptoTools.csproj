@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Utils\DateTimeExtensions.cs" />
     <Compile Include="Utils\FileHeaders.cs" />
     <Compile Include="Utils\HexHelper.cs" />
     <Page Include="MainWindow.xaml">

@@ -6,18 +6,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace QuartzCryptoTools
 {
@@ -26,8 +19,6 @@ namespace QuartzCryptoTools
     /// </summary>
     public partial class MainWindow : WindowX, INotifyPropertyChanged
     {
-        [DllImport("kernel32")]
-        private static extern Object DosDateTimeToFileTime(DateTime dt);
         public MainWindow()
         {
             InitializeComponent();
@@ -123,6 +114,7 @@ namespace QuartzCryptoTools
             catch (Exception)
             {
                 // 未被定义的文件类型
+                HeaderDict = new string[1];
                 DataBind.FileType = "Unrecorded File Type[" + FileHead.ToString() + "]";
                 DataBind.FileDescription = "No Description";
                 IsFileTypeRecorded = false;
@@ -204,6 +196,7 @@ namespace QuartzCryptoTools
                     HexDataTable.Rows.Add(row);
                     // 修改待绑定数据
                     DataBind.HexTableBind = HexDataTable.DefaultView;
+                    DataBind._isHexTableCHanged = false;
                     IsHexLoaded = true;
                 });
                 // 绑定数据
@@ -294,9 +287,11 @@ namespace QuartzCryptoTools
                                 // 加载 CRC-32
                                 row["CRC-32"] = DictHeader[19].ToString("X2") + DictHeader[18].ToString("X2") + DictHeader[17].ToString("X2") + DictHeader[16].ToString("X2");
                                 // 加载压缩后大小
-                                row["SuprressedSize"] = Convert.ToInt32(DictHeader[23].ToString("X2") + DictHeader[22].ToString("X2") + DictHeader[21].ToString("X2") + DictHeader[20].ToString("X2"), 16);
+                                String SuppressedSizeHex = DictHeader[23].ToString("X2") + DictHeader[22].ToString("X2") + DictHeader[21].ToString("X2") + DictHeader[20].ToString("X2");
+                                row["SuprressedSize"] = Convert.ToInt32(SuppressedSizeHex, 16);
                                 // 加载压缩前大小
-                                row["PreviousSize"] = Convert.ToInt32(DictHeader[27].ToString("X2") + DictHeader[26].ToString("X2") + DictHeader[25].ToString("X2") + DictHeader[24].ToString("X2"), 16);
+                                String PreviousSizeHex = DictHeader[27].ToString("X2") + DictHeader[26].ToString("X2") + DictHeader[25].ToString("X2") + DictHeader[24].ToString("X2");
+                                row["PreviousSize"] = Convert.ToInt32(PreviousSizeHex, 16);
                                 // 加载文件名长度
                                 int FileNameLength = Convert.ToInt32(DictHeader[28]);
                                 // 截取文件名
@@ -304,16 +299,9 @@ namespace QuartzCryptoTools
                                 for (int j = i + 46; j < i + 46 + FileNameLength; j++)
                                 { FileNameByte.Add(ZipModifierTempFile[j]); }
                                 row["Name"] = Encoding.UTF8.GetString(FileNameByte.ToArray());
-                                // 加载修改日期 参考：https://stackoverflow.com/questions/15744647/converting-date-to-dos-date
-                                ushort ByteDateInt = (ushort)Convert.ToInt32(DictHeader[15].ToString("X2") + DictHeader[14].ToString("X2"), 16);
-                                DateTime dateTime = new DateTime((ByteDateInt >> 9) + 1980, (ByteDateInt >> 5) & 0xF, ByteDateInt & 0x1F);
-                                // 加载修改时间
-                                // 换算第一字节时间
-                                int Byte12Int = Convert.ToInt32(DictHeader[12].ToString("X2"), 16);
-                                dateTime = dateTime.AddSeconds(Byte12Int * 2 - (((int)Math.Ceiling((Double)Byte12Int / 32) - 1) * 4));
-                                // 换算第二字节时间
-                                int Byte13Int = Convert.ToInt32(DictHeader[13].ToString("X2"), 16);
-                                dateTime = dateTime.AddMinutes(Byte13Int * 8 - (((int)Math.Ceiling((Double)Byte13Int / 8) - 1) * 4));
+                                // 加载修改日期时间
+                                String DosDateTimeHex = DictHeader[15].ToString("X2") + DictHeader[14].ToString("X2") + DictHeader[13].ToString("X2") + DictHeader[12].ToString("X2");
+                                DateTime dateTime = DateTimeExtensions.ToDateTime((int)Convert.ToInt64(DosDateTimeHex, 16));
                                 row["LastModify"] = dateTime.ToString();
                                 // 加入文件信息
                                 ArchiveDictTable.Rows.Add(row);
@@ -324,6 +312,7 @@ namespace QuartzCryptoTools
                     }
                     // 修改待绑定数据
                     DataBind.ArchiveDictTableBind = ArchiveDictTable.DefaultView;
+                    DataBind._isArchiveTableChanged = false;
                     IsZipDictLoaded = true;
                 });
                 // 绑定数据
@@ -529,10 +518,12 @@ namespace QuartzCryptoTools
             set
             {
                 _hexTableBind = value;
+                _isHexTableCHanged = true;
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(HexTableBind)));
             }
         }
         private static DataView _hexTableBind = new DataView();
+        public static bool _isHexTableCHanged = false;
 
         #endregion
 
@@ -544,10 +535,12 @@ namespace QuartzCryptoTools
             set
             {
                 _archiveDictTableBind = value;
+                _isArchiveTableChanged = true;
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ArchiveDictTableBind)));
             }
         }
         private static DataView _archiveDictTableBind = new DataView();
+        public static bool _isArchiveTableChanged = false;
 
         #endregion
     }
