@@ -359,6 +359,15 @@ namespace QuartzCryptoTools
         }
 
         #endregion
+
+        #region Lsb隐写部分代码
+
+        private void LoadLsbData()
+        {
+
+        }
+
+        #endregion
     }
 
     public class DataBind //数据绑定类
